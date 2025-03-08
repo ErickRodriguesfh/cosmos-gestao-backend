@@ -5,25 +5,36 @@ import br.ebr.cosmos.cosmos_gestao.application.dto.LoginResponseDTO;
 import br.ebr.cosmos.cosmos_gestao.application.dto.UserDTO;
 import br.ebr.cosmos.cosmos_gestao.application.usecases.UserUseCases;
 import br.ebr.cosmos.cosmos_gestao.domain.user.User;
+import br.ebr.cosmos.cosmos_gestao.infrastructure.config.security.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private final UserUseCases userUseCases;
+    private final AuthService authService;
 
-    public AuthController(UserUseCases userUseCases) {
-        this.userUseCases = userUseCases;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
-        return ResponseEntity.ok(userUseCases.login(loginRequestDTO));
+    @PostMapping("/signin")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDTO loginRequestDTO) {
+        var response = authService.authenticateUser(loginRequestDTO);
+        if (Objects.isNull(response)) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("message", "Bad credentials");
+            map.put("status", false);
+            return new ResponseEntity<Object>(map, HttpStatus.NOT_FOUND);
+        }
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
@@ -36,7 +47,7 @@ public class AuthController {
         newUser.setUsername(userDTO.username());
         newUser.setEmail(userDTO.email());
         newUser.setImageUrl(userDTO.imageUrl());
-        userUseCases.register(newUser);
+        authService.register(newUser);
     }
 
 }

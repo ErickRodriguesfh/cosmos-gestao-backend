@@ -27,7 +27,6 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('SCOPE_BASIC')")
     public List<User> findAll() {
         return userUseCases.findAll();
     }

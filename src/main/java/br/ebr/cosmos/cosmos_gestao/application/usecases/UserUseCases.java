@@ -19,12 +19,4 @@ public interface UserUseCases {
 
     void deleteById(Long id);
 
-    LoginResponseDTO login(LoginRequestDTO loginRequestDTO);
-
-    boolean isLoginCorrect(LoginRequestDTO loginRequestDTO,
-                           PasswordEncoder passwordEncoder,
-                           User user);
-
-    void register(User user);
-
 }
