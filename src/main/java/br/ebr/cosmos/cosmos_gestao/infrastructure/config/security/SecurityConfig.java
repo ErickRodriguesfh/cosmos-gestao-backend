@@ -42,7 +42,7 @@ public class SecurityConfig {
                 csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).ignoringRequestMatchers("/api/auth/**"));
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/auth/signin").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest()
                         .authenticated());
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPointJwt));
